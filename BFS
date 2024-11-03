@@ -1,0 +1,32 @@
+def breadth_first_search_find_reachable_nodes(graph, starting_vertex):
+    visited = {starting_vertex}
+    queue = deque([[starting_vertex]])
+    while queue:
+        vertex_list = queue.popleft()
+        vertex_to_expand = vertex_list[-1]
+        for neighbour in graph.neighbours(vertex_to_expand):
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(vertex_list + [neighbour])
+    return visited
+
+
+breadth_first_search_find_reachable_nodes(a, '186 - Марвинци 1 (авто-патека)')
+
+
+all_vertices = set(a.vertices())
+
+counter = 0
+isolated_raod_networks = []
+
+while all_vertices:
+    one_vertex = list(all_vertices)[0]
+    reachable = breadth_first_search_find_reachable_nodes(a, one_vertex)
+    all_vertices.difference_update(reachable)
+    isolated_raod_networks.append((len(reachable), reachable))
+    counter += 1
+counter
+
+
+
+sorted(isolated_raod_networks, reverse=True)
