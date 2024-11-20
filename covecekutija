@@ -1,0 +1,91 @@
+def findhuman(state):
+    for i,row in enumerate(state):
+        for j, m in enumerate(row):
+            if m==1:
+                return (i,j)
+                
+
+def findbox(state):
+    for i,row in enumerate(state):
+        for j, m in enumerate(row):
+            if m==2:
+                return (i,j)
+                
+
+def human_next_moves(state):
+    xh,yh=state
+    moves=[]
+    human_possible_moves=[(xh+1,yh),(xh-1,yh),(xh,yh+1),(xh,yh-1)]
+    for m,n in human_possible_moves:
+        if is_valid((m,n)):
+            moves.append((m,n))
+    return moves
+
+def findfinish(state):
+    for i,row in enumerate(state):
+        for j, m in enumerate(row):
+            if m==3:
+                return (i,j)
+                
+
+def is_valid(state):
+    i,j=state
+    if i>=0 and j>=0 and i<5 and j<5:
+        return True
+    else:
+        return False
+
+
+          def expand_state(state):
+    states=[]
+    xh,yh=findhuman(state)
+    for xhnext,yhnext in human_next_moves((xh,yh)):
+        new_state=list(list(x for x in row)for row in state)
+        if is_valid((xhnext,yhnext)) :
+            new_state[xh][yh]=0
+            if new_state[xhnext][yhnext]==findbox(new_state):
+                if is_valid((xhnext+xhnext-xh,yhnext+yhnext-yh)):
+                    new_state[xhnext+xhnext-xh][yhnext+yhnext-yh]=2
+                    new_state[xhnext][yhnext]=1
+            else: new_state[xhnext][yhnext]=1
+            states.append(tuple(tuple(x for x in row)for row in new_state))
+    return states        
+
+
+
+def chech_goal(state):
+    for i,row in enumerate(state):
+        for j, m in enumerate(row):
+            if findbox(state)==findfinish(state):
+                return True
+    return False
+
+
+
+  def search_path(initial_state):
+    visited = {initial_state}
+    states_queue = deque([[initial_state]])
+    while states_queue:
+        states_list = states_queue.popleft()
+        state_to_expand = states_list[-1]
+        for next_state in expand_state(state_to_expand):
+            if next_state not in visited:
+                if chech_goal(next_state):
+                    return states_list + [next_state]
+                visited.add(next_state)
+                states_queue.append(states_list + [next_state])
+    return []
+
+
+
+##input_funkcija
+
+  table = [
+    [0, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 0],
+    [0, 1, 0, 0, 0]
+]
+table=tuple(tuple(x for x in row)for row in table)
+search_path(table)
