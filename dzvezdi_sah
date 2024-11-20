@@ -1,0 +1,106 @@
+def chechgoal(state):
+    for row in state:
+        for i in row:
+            if i==3:
+                return True
+    else: return False
+
+def limittable(state):
+    x,y=state
+    if x>=0 and x<8 and y>=0 and y<8:
+        return True
+    else: return False
+
+def sameposition(state_knight,state_lanfer):
+    x1,y1 = state_knight
+    x2,y2 = state_lanfer
+    if x1==x2 and y1==y2:
+        return True
+    else:return False
+
+def possible_moves_knight(state):
+    i,j=state
+    possible_moves=[(i+1,j+2),(i+1,j-2),(i-1,j+2),(i-1,j-2),(i+2,j+1),(i+2,j-1),(i-2,j+1),(i-2,j-1)]
+    newlist=[]
+    for m,n in possible_moves:
+        if m>=0 and n>=0 and m<8 and n<8:
+            newlist.append((m,n))
+            
+        
+    return newlist
+
+def possible_moves_lanfer(state):
+    i,j=state
+    newlist=[]
+    possible_moves=[(i+1, j+1),(i+1, j-1),(i-1, j+1),(i-1, j-1)]
+    for m,n in possible_moves:
+        if m>=0 and n>=0 and m<8 and n<8:
+            newlist.append((m,n))
+            
+        
+    return newlist
+    
+            
+
+def find_pos_knight(matrix_state):
+    for i, row in enumerate(matrix_state):
+        for j, column in enumerate(row):
+            if matrix_state[i][j] == 1:
+                return (i,j)
+    return(0,0)
+
+def find_pos_bishop(matrix_state):
+    for i, row in enumerate(matrix_state):
+        for j, column in enumerate(row):
+            if matrix_state[i][j] == 2:
+                return (i,j)
+    return (0,0)
+
+def expand_state(matrix_state):
+    states=[]
+    new_state_matrix = [list(row) for row in matrix_state]
+    x1,y1=find_pos_knight(new_state_matrix)
+    x2,y2=find_pos_bishop(new_state_matrix)
+    for newx1,newy1 in (possible_moves_knight((x1,y1))):
+        for newx2,newy2 in (possible_moves_lanfer((x2,y2))):
+            if not sameposition((newx1,newy1),(newx2,newy2)):
+                if limittable((newx1,newy1)):
+                    new_state_matrix[x1][y1]=0
+                    new_state_matrix[newx1][newy1]=1
+                    x1=newx1
+                    y1=newy1
+                if limittable((newx2,newy2)):
+                    new_state_matrix[x2][y2]=0
+                    new_state_matrix[newx2][newy2]=2
+                    x2=newx2
+                    y2=newy2
+                states.append(tuple(tuple(x for x in row) for row in new_state_matrix))
+    return states       
+        
+
+def search_path(initial_state):
+    visited = {initial_state}
+    states_queue = deque([[initial_state]])
+    while states_queue:
+        states_list = states_queue.popleft()
+        state_to_expand = states_list[-1]
+        for next_state in expand_state(state_to_expand):
+            if next_state not in visited:
+                if not chechgoal(next_state):
+                    return states_list + [next_state]
+                visited.add(next_state)
+                states_queue.append(states_list + [next_state])
+    return []
+
+%%time
+table = (
+    (0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 0, 0, 0, 0, 0, 3, 0),
+    (0, 0, 1, 0, 0, 0, 0, 0),
+    (0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 0, 0, 0, 3, 0, 0, 0),
+    (0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 3, 0, 0, 0, 2, 0, 0),
+    (0, 0, 0, 0, 0, 0, 0, 0),
+    )
+search_path(table)
