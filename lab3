@@ -68,3 +68,39 @@ table = [
 ]
 table = tuple(tuple(x for x in row) for row in table)
 search_path(table, expand_state, check_goal)
+
+
+
+
+
+/////////SO A* ALGORITAM
+
+def h(state):
+#state_matrix = [list(row) for row in state]
+    count_1 = sum(row.count(1) for row in state)
+    answer = count_1/5
+    return answer
+
+
+def a_star_search(starting_vertex, heuristic_function, alpha=1):
+    expanded = set()
+    queue = [((0, 0), [starting_vertex])]
+    heapq.heapify(queue)
+    c = 0
+    while queue:
+        c += 1
+        weight_tuple, vertex_list = heapq.heappop(queue)
+        current_a_star_weight, current_path_weight = weight_tuple
+        vertex_to_expand = vertex_list[-1]
+        if check_goal(vertex_to_expand):
+            return current_path_weight, vertex_list, c
+        if vertex_to_expand in expanded:
+            continue
+        for neighbour in expand_state(vertex_to_expand):
+            if neighbour not in expanded:
+                heuristic = heuristic_function(neighbour)
+                path_weight = current_path_weight + 1
+                a_star_weight = path_weight + alpha * heuristic
+                heapq.heappush(queue, ((a_star_weight, path_weight),
+                vertex_list + [neighbour]))
+        expanded.add(vertex_to_expand)
