@@ -1,0 +1,93 @@
+from graph import Graph
+
+a=Graph()
+a.add_vertex('koza')
+a.add_vertex('ovca')
+a.add_edge(('koza','ovca'))
+a.neighbours('ovca')
+a.remove_vertex('ovca')
+
+def possmoves(state):
+    i,j=state
+    possible_moves=[(i+1,j+2),(i+1,j-2),(i-1,j+2),(i-1,j-2),(i+2,j+1),(i+2,j-1),(i-2,j+1),(i-2,j-1)]
+    newlist=[]
+    for m,n in possible_moves:
+        if m>=0 and n>=0 and m<8 and n<8:
+            newlist.append((m,n))
+            
+        
+    return newlist
+
+possmoves(0,0)
+
+from collections import deque
+
+def search_path(initial_state, goal_state):
+    visited = {initial_state}
+    states_queue = deque([[initial_state]])
+    while states_queue:
+        states_list = states_queue.popleft()
+        state_to_expand = states_list[-1]
+        for next_state in possmoves(state_to_expand):
+            if next_state not in visited:
+                if next_state == goal_state:
+                    return states_list + [next_state]
+                visited.add(next_state)
+                states_queue.append(states_list + [next_state])
+    return []
+
+%%time
+search_path((4,4),(1,4))
+
+
+def isvalid(state):
+    farmer,volk,jare,zelka,boat=state
+    if farmer!=volk and volk==jare:
+        return False
+    if farmer!=jare and jare==zelka:
+        return False
+    return True
+
+def expand_state(state):
+    newstate=[]
+    for i in range(len(state)):
+        if state[4]==state[0]:
+            newstates=list(state)
+            newstates[0]=1-newstates[0]
+            newstates[4]=1-newstates[4]
+            newstates[i]=newstates[4]
+            newstates=tuple(newstates)
+        if isvalid(newstates):
+            newstate.append(newstates)
+    return newstate
+
+
+
+
+def search_path(initial_state, goal_state):
+    visited = {initial_state}
+    states_queue = deque([[initial_state]])
+    while states_queue:
+        states_list = states_queue.popleft()
+        state_to_expand = states_list[-1]
+        for next_state in expand_state(state_to_expand):
+            if next_state not in visited:
+                if next_state == goal_state:
+                    return states_list + [next_state]
+                visited.add(next_state)
+                states_queue.append(states_list + [next_state])
+    return []
+
+
+
+
+
+
+
+
+%%time
+resenie=search_path((1,1,1,1,1),(0,0,0,0,0))
+print("farmer","volk","jare","zelka","brod")
+resenie
+
+    
